@@ -1,4 +1,7 @@
 #include "stack.h"
+#include "DynamicArray.h"
+#include <stdexcept>
+#include <cstdint>
 
 template<typename T>
 stack<T>::stack(std::int64_t capacity) : max_size(capacity), data(capacity) {}

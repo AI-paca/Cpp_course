@@ -1,4 +1,7 @@
 #include "queue.h"
+#include "DynamicArray.h"
+#include <stdexcept>
+#include <cstdint>
 
 template<typename T>
 queue<T>::queue() {}
