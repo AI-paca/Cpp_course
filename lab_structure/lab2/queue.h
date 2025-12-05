@@ -12,28 +12,11 @@ private:
 protected:
 
 public:
-  queue() {}
-
-  void enqueue(T item) {
-    data.push_back(item);
-  }
-
-  T dequeue() {
-    if (isEmpty()) {
-      throw std::underflow_error("Queue empty");
-    }
-    T item = data.front();
-    data.erase(0);
-    return item;
-  }
-
-  bool isEmpty() {
-    return data.getSize() == 0;
-  }
-
-  int size() {
-    return data.getSize();
-  }
+  queue();
+  void enqueue(T item);
+  T dequeue();
+  bool isEmpty();
+  int size();
 };
 
 #endif // QUEUE_H

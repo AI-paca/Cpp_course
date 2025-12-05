@@ -285,6 +285,11 @@ void DynamicArray<T>::decrease_capacity(std::int64_t newCapacity){
   }
 }
 
+template<typename T>
+std::int64_t DynamicArray<T>::getSize() const {
+  return size + 1; // size хранит индекс последнего элемента, поэтому +1
+}
+
 // Явная инстанциализация для часто используемых типов
 template class DynamicArray<int>;
 template class DynamicArray<float>;

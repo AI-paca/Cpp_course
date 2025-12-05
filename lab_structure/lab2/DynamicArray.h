@@ -12,11 +12,10 @@ private:
   std::int64_t size = -1; // actual (last occupied)
   std::int64_t capacity; // max
 
+public:
   bool isEmpty() {
     return size == -1;
   }
-
-public:
   DynamicArray(); // default ctor
   DynamicArray(std::int64_t capacity); // parametrized ctor
   DynamicArray(DynamicArray& other);
@@ -50,6 +49,7 @@ public:
   void increase_capacity(std::int64_t newCapacity);
   void decrease_capacity(std::int64_t newCapacity); //новая вместимость может быть меньше количества элементов
 
+  std::int64_t getSize() const; // получить текущий размер массива
 };
 
 #endif // DYNAMICARRAY_H
