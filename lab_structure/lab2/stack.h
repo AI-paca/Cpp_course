@@ -2,32 +2,49 @@
 #define STACK_H
 
 #include "DynamicArray.h"
+#include <stdexcept>
 
-template<typename x> //видимо это Template Specialization
+template<typename T>
 class stack {
 private:
-
-//Класс `stack` обязан быть шаблонным и использовать внутри класс `DynamicArray`
-  DynamicArray data; //так... а если я хочу хранить не float...
-                     //а вдруг комментарии кто-то читает...  
-  std::int64_t max_size; //максимальный размер стека
-  std::int64_t current_size = 0; //текущий размер стека
-
-//Класс `stack` имеет фиксированный максимальный размер, переполнение ведет в выбросу исключения `std::overflow_error`.
-
+  DynamicArray<T> data;
+  std::int64_t max_size;
 
 protected:
 
 public:
+  stack(std::int64_t capacity) : max_size(capacity), data(capacity) {}
 
-//место для коструктора с параметром, который задает максимальный размер стека (int_t64_t) т.к. размер может быть -1000
+  void push(T item) {
+    if (data.getSize() >= max_size) {
+      throw std::overflow_error("Stack overflow");
+    }
+    data.push_back(item);
+  }
 
+  T top() {
+    if (isEmpty()) {
+      throw std::underflow_error("Stack empty");
+    }
+    return data.back();
+  }
 
-    void push(x); //добавить элемент в стек
-    x top(); //посмотреть на элемент, находящийся на вершине стека без удаления
-    x pop(); //удалить элемент на вершине стека и вернуть его
-    bool isEmpty(); //проверка стека на пустоту
-    int size(); //возвращает кол-во элементов в стеке
+  T pop() {
+    if (isEmpty()) {
+      throw std::underflow_error("Stack empty");
+    }
+    T item = data.back();
+    data.erase(data.getSize() - 1);
+    return item;
+  }
+
+  bool isEmpty() {
+    return data.getSize() == 0;
+  }
+
+  int size() {
+    return data.getSize();
+  }
 };
 
 #endif // STACK_H

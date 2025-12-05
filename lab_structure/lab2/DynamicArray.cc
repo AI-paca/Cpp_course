@@ -4,13 +4,16 @@
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
-DynamicArray::DynamicArray() {
+template<typename T>
+DynamicArray<T>::DynamicArray() {
   this->capacity = 8;
-  this->data = new float[this->capacity];
+  this->data = new T[this->capacity];
 }
 
-DynamicArray::DynamicArray(std::int64_t capacity) {
+template<typename T>
+DynamicArray<T>::DynamicArray(std::int64_t capacity) {
   // check if user is dumb
   if (capacity < 1) {
     throw std::invalid_argument("Capacity < 1"); // https://en.cppreference.com/w/cpp/error/exception.html
@@ -18,27 +21,30 @@ DynamicArray::DynamicArray(std::int64_t capacity) {
     // std::invalid_argument like a dog (heir of animal)
   }
   this->capacity = capacity;
-  this->data = new float[this->capacity];
+  this->data = new T[this->capacity];
 }
 
-DynamicArray::DynamicArray(DynamicArray& other) {
+template<typename T>
+DynamicArray<T>::DynamicArray(DynamicArray& other) {
   this->size = other.size;
   this->capacity = other.capacity;
-  this->data = new float[this->capacity]; // (*this).data
+  this->data = new T[this->capacity]; // (*this).data
 
   for (int i = 0; i <= size; ++i) {
     this->data[i] = other.data[i];
   }
 }
 
-DynamicArray::~DynamicArray() {
+template<typename T>
+DynamicArray<T>::~DynamicArray() {
   // deallocate if allocated
   if (this->data) {
     delete[] this->data;
   }
 }
 
-void DynamicArray::push_back(float x) {
+template<typename T>
+void DynamicArray<T>::push_back(T x) {
   // reallocate memory
   // increase capacity
   // copy data
@@ -46,7 +52,7 @@ void DynamicArray::push_back(float x) {
   // assign new to old
   if (size + 1 >= capacity) {
     std::int64_t newCapacity = capacity * 2;
-    float* tempArray = new float[newCapacity];
+    T* tempArray = new T[newCapacity];
     for (int i = 0; i < capacity; ++i) {
       tempArray[i] = data[i];
     }
@@ -59,20 +65,21 @@ void DynamicArray::push_back(float x) {
   // ++size;
 }
 
-float DynamicArray::add(std::int64_t idx1, std::int64_t idx2) {
+template<typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::add(std::int64_t idx1, std::int64_t idx2) {
   if (idx1 > size || idx2 > size || idx1 < 0 || idx2 < 0) {
     throw std::invalid_argument("idx1 or idx2 out of range");
   }
   return data[idx1] + data[idx2];
 }
 
-float DynamicArray::max() {
+template<typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::max() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
-  float currentMax = -1e+38; // -1 * 10^38
-  // float currentMax = std::numeric_limits<float>::lowest();
-  for (int i = 0; i <= size; ++i) {
+  T currentMax = data[0];
+  for (int i = 1; i <= size; ++i) {
     if (data[i] >= currentMax) {
       currentMax = data[i];
     }
@@ -80,13 +87,13 @@ float DynamicArray::max() {
   return currentMax;
 }
 
-float DynamicArray::min() {
+template<typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::min() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
-  float currentMin = 1e+38; // -1 * 10^38
-  // float currentMin = std::numeric_limits<float>::max();
-  for (int i = 0; i <= size; ++i) {
+  T currentMin = data[0];
+  for (int i = 1; i <= size; ++i) {
     if (data[i] <= currentMin) {
       currentMin = data[i];
     }
@@ -94,7 +101,8 @@ float DynamicArray::min() {
   return currentMin;
 }
 
-void DynamicArray::clear() {
+template<typename T>
+void DynamicArray<T>::clear() {
   if (this->data) {
     delete[] this->data;
     this->data = nullptr;
@@ -103,12 +111,14 @@ void DynamicArray::clear() {
   capacity = 8;
 }
 
-void DynamicArray::reinitialize() {
+template<typename T>
+void DynamicArray<T>::reinitialize() {
   clear();
-  data = new float[capacity](); // init with zeros
+  data = new T[capacity]; // init without zeros for non-arithmetic types
 }
 
-void DynamicArray::printData() {
+template<typename T>
+void DynamicArray<T>::printData() {
   if (isEmpty()) {
     return;
   }
@@ -118,7 +128,8 @@ void DynamicArray::printData() {
   std::cout << std::endl;
 }
 
-float DynamicArray::operator[](std::int64_t idx) {
+template<typename T>
+T DynamicArray<T>::operator[](std::int64_t idx) {
   if (isEmpty() || idx < 0 || idx > size) {
     throw std::invalid_argument("Out of range");
   }
@@ -126,11 +137,12 @@ float DynamicArray::operator[](std::int64_t idx) {
   // return data[idx];     // European operator[]
 }
 
-float DynamicArray::operator()() {
+template<typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::operator()() {
   if (isEmpty()) {
     return 0;
   }
-  float sum = 0;
+  T sum = 0;
   for (int i = 0; i <= size; ++i) {
     sum += data[i];
   }
@@ -139,10 +151,11 @@ float DynamicArray::operator()() {
 
 ////////////////////////////////////////////// HW
 
-  void DynamicArray::push_front(float x){
+template<typename T>
+void DynamicArray<T>::push_front(T x){
   if (size + 1 >= capacity) {
     std::int64_t newCapacity = capacity * 2;
-    float* tempArray = new float[newCapacity];
+    T* tempArray = new T[newCapacity];
     for (int i = 0; i < capacity; ++i) {
       tempArray[i+1] = data[i];
     }
@@ -154,7 +167,7 @@ float DynamicArray::operator()() {
     return;
   }
   else {
-    float temp = data[0];
+    T temp = data[0];
     for (int i = 0; i <= size; ++i) {
       std::swap(data[i+1], temp);
     }
@@ -162,106 +175,118 @@ float DynamicArray::operator()() {
     ++size;
     return;
   }
+}
+
+template<typename T>
+T DynamicArray<T>::front(){
+  if (isEmpty()) {
+    throw std::invalid_argument("Empty array");
+  }
+  return data[0];
+}
+
+template<typename T>
+T DynamicArray<T>::back(){
+  if (isEmpty()) {
+    throw std::invalid_argument("Empty array");
+  }
+  return data[size];
+}
+
+template<typename T>
+void DynamicArray<T>::insert(std::int64_t idx, T val){
+  if (idx < 0 || idx > size + 1) {
+    throw std::invalid_argument("Index out of range");
   }
 
-  float DynamicArray::front(){
-    if (isEmpty()) {
-      throw std::invalid_argument("Empty array");
+  //сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это не инсерт, а replace)
+  if (size + 1 >= capacity) {
+    std::int64_t newCapacity = capacity * 2;
+    T* tempArray = new T[newCapacity];
+    for (int i = 0; i < idx; ++i) {
+      tempArray[i] = data[i];
     }
-    return data[0];
+    tempArray[idx] = val;
+    for (int i = idx; i <= size; ++i) {
+      tempArray[i + 1] = data[i];
+    }
+    delete[] data;
+    data = tempArray;
+    capacity = newCapacity;
+    ++size;
+    return;
   }
-
-  float DynamicArray::back(){
-    if (isEmpty()) {
-      throw std::invalid_argument("Empty array");
+  else {
+    T temp = data[idx];
+    data[idx] = val;
+    for (int i = idx; i <= size; ++i) {
+      std::swap(data[i + 1], temp);
     }
-    return data[size];
+    ++size;
+    return;
   }
+}
 
-  void DynamicArray::insert(std::int64_t idx, float val){
-    if (idx < 0 || idx > size + 1) {
-      throw std::invalid_argument("Index out of range");
-    }
-
-    //сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это не инсерт, а replace)
-    if (size + 1 >= capacity) {
-      std::int64_t newCapacity = capacity * 2;
-      float* tempArray = new float[newCapacity];
-      for (int i = 0; i < idx; ++i) {
-        tempArray[i] = data[i];
-      }
-      tempArray[idx] = val;
-      for (int i = idx; i <= size; ++i) {
-        tempArray[i + 1] = data[i];
-      }
-      delete[] data;
-      data = tempArray;
-      capacity = newCapacity;
-      ++size;
-      return;
-    }
-    else {
-      float temp = data[idx];
-      data[idx] = val;
-      for (int i = idx; i <= size; ++i) {
-        std::swap(data[i + 1], temp);
-      }
-      ++size;
-      return;
-    }
+template<typename T>
+void DynamicArray<T>::erase(std::int64_t idx){
+  if (idx < 0 || idx > size) {
+    throw std::invalid_argument("Index out of range");
   }
+  //сдвигать элементы массива, стоящие правее data[idx] влево
+  for (int i = idx; i < size; ++i) {
+    data[i] = data[i + 1];
+  }
+  --size;
+}
 
-  void DynamicArray::erase(std::int64_t idx){
-    if (idx < 0 || idx > size) {
-      throw std::invalid_argument("Index out of range");
-    }
-    //сдвигать элементы массива, стоящие правее data[idx] влево
-    for (int i = idx; i < size; ++i) {
-      data[i] = data[i + 1];
-    }
+template<typename T>
+void DynamicArray<T>::erase_after(std::int64_t idx){
+  if (idx < 0 || idx > size) {
+    throw std::invalid_argument("Index out of range");
+  }
+  for (int i = idx + 1; i <= size; ++i) {
     --size;
   }
+  //удалить все после элемента idx (тебя должен капасити остаться тот же, в то время как элементов для доступа меньше)
+  // Было 10 элементов, капасити 15
+  // Erase_after(5)
+  // Остаются первые 6, капасити также 15, размер 6
+}
 
-  void DynamicArray::erase_after(std::int64_t idx){
-    if (idx < 0 || idx > size) {
-      throw std::invalid_argument("Index out of range");
-    }
-    for (int i = idx + 1; i <= size; ++i) {
-      data[i] = 0; // optional
-      --size;
-    }
-    //удалить все после элемента idx (тебя должен капасити остаться тот же, в то время как элементов для доступа меньше)
-    // Было 10 элементов, капасити 15
-    // Erase_after(5)
-    // Остаются первые 6, капасити также 15, размер 6
-  } 
-
-  void DynamicArray::increase_capacity(std::int64_t newCapacity){
-    if (newCapacity <= capacity) {
-      throw std::invalid_argument("New capacity must be greater than current capacity");
-    }
-    float* tempArray = new float[newCapacity];
-    for (int i = 0; i <= size; ++i) {
-      tempArray[i] = data[i];
-    }
-    delete[] data;
-    data = tempArray;
-    capacity = newCapacity;
+template<typename T>
+void DynamicArray<T>::increase_capacity(std::int64_t newCapacity){
+  if (newCapacity <= capacity) {
+    throw std::invalid_argument("New capacity must be greater than current capacity");
   }
-
-  void DynamicArray::decrease_capacity(std::int64_t newCapacity){ 
-    if (newCapacity < 0) {
-      throw std::invalid_argument("New capacity must be greater than or equal to number of elements");
-    }
-    //новая вместимость может быть меньше количества элементов 
-    float* tempArray = new float[newCapacity];
-    for (int i = 0;(i <= size) && (i < newCapacity); ++i) {
-      tempArray[i] = data[i];
-    }
-    delete[] data;
-    data = tempArray;
-    capacity = newCapacity;
-    if (size >= newCapacity) {
-      size = newCapacity - 1;
-    }
+  T* tempArray = new T[newCapacity];
+  for (int i = 0; i <= size; ++i) {
+    tempArray[i] = data[i];
   }
+  delete[] data;
+  data = tempArray;
+  capacity = newCapacity;
+}
+
+template<typename T>
+void DynamicArray<T>::decrease_capacity(std::int64_t newCapacity){
+  if (newCapacity < 0) {
+    throw std::invalid_argument("New capacity must be greater than or equal to number of elements");
+  }
+  //новая вместимость может быть меньше количества элементов
+  T* tempArray = new T[newCapacity];
+  for (int i = 0;(i <= size) && (i < newCapacity); ++i) {
+    tempArray[i] = data[i];
+  }
+  delete[] data;
+  data = tempArray;
+  capacity = newCapacity;
+  if (size >= newCapacity) {
+    size = newCapacity - 1;
+  }
+}
+
+// Явная инстанциализация для часто используемых типов
+template class DynamicArray<int>;
+template class DynamicArray<float>;
+template class DynamicArray<double>;
+template class DynamicArray<char>;

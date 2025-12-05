@@ -2,23 +2,38 @@
 #define QUEUE_H
 
 #include "DynamicArray.h"
+#include <stdexcept>
 
-template<typename x>
+template<typename T>
 class queue {
 private:
-
+  DynamicArray<T> data;
 
 protected:
+
 public:
+  queue() {}
 
-//место для коструктора с параметром, который задает максимальный размер стека (int_t64_t) т.к. размер может быть -1000
+  void enqueue(T item) {
+    data.push_back(item);
+  }
 
+  T dequeue() {
+    if (isEmpty()) {
+      throw std::underflow_error("Queue empty");
+    }
+    T item = data.front();
+    data.erase(0);
+    return item;
+  }
 
-//Для класса queue необходимо имлементировать:
-    void enqueue(x); //добавить элемент в очередь
-    x dequeue(); //удалить элемент из очереди и вернуть его
-    bool isEmpty(); //проверка очереди на пустоту
-    int size(); //возвращает кол-во элементов в очереди
+  bool isEmpty() {
+    return data.getSize() == 0;
+  }
+
+  int size() {
+    return data.getSize();
+  }
 };
 
 #endif // QUEUE_H

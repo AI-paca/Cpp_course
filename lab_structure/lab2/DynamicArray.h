@@ -2,12 +2,13 @@
 #define DYNAMICARRAY_H
 
 #include <cstdint>
-// size_t == unsigned long long
+#include <stdexcept>
+#include <type_traits>
 
-//похоже теперь float недостаточно 
+template<typename T>
 class DynamicArray {
 private:
-  float* data;
+  T* data;
   std::int64_t size = -1; // actual (last occupied)
   std::int64_t capacity; // max
 
@@ -21,28 +22,33 @@ public:
   DynamicArray(DynamicArray& other);
   ~DynamicArray(); // destructor
 
-  void push_back(float x);
-  float add(std::int64_t idx1, std::int64_t idx2);
-  float max();
-  float min();
+  void push_back(T x);
+
+  // Арифметические операции (только для числовых типов)
+  typename std::enable_if<std::is_arithmetic<T>::value, T>::type add(std::int64_t idx1, std::int64_t idx2);
+
+  typename std::enable_if<std::is_arithmetic<T>::value, T>::type max();
+
+  typename std::enable_if<std::is_arithmetic<T>::value, T>::type min();
+
   void clear(); // deallocate the data
   void reinitialize(); // restore to default
   void printData();
 
-  float operator[](std::int64_t idx);
-  float operator()();
+  T operator[](std::int64_t idx);
+  typename std::enable_if<std::is_arithmetic<T>::value, T>::type operator()();
 
-  void push_front(float x);
-  float front(); //получить нулевой элемент
-  float back(); //получить последний элемент
-  void insert(std::int64_t idx, float val);//сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это не инсерт, а replace)
+  void push_front(T x);
+  T front(); //получить нулевой элемент
+  T back(); //получить последний элемент
+  void insert(std::int64_t idx, T val);//сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это не инсерт, а replace)
   void erase(std::int64_t idx); //сдвигать элементы массива, стоящие правее data[idx] влево
   void erase_after(std::int64_t idx); //удалить все после элемента idx (тебя должен капасити остаться тот же, в то время как элементов для доступа меньше)
     // Было 10 элементов, капасити 15
     // Erase_after(5)
     // Остаются первые 6, капасити также 15, размер 6
   void increase_capacity(std::int64_t newCapacity);
-  void decrease_capacity(std::int64_t newCapacity); //новая вместимость может быть меньше количества элементов 
+  void decrease_capacity(std::int64_t newCapacity); //новая вместимость может быть меньше количества элементов
 
 };
 
