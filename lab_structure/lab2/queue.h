@@ -1,18 +1,20 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "DynamicArray.h"
+#include "stack.h"
 #include <stdexcept>
 
 template<typename T>
 class queue {
 private:
-  DynamicArray<T> data;
+  stack<T> inputStack;
+  stack<T> outputStack;
 
 protected:
 
 public:
   queue();
+  queue(std::int64_t size);
   void enqueue(T item);
   T dequeue();
   bool isEmpty();

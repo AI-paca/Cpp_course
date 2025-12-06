@@ -4,7 +4,18 @@
 #include <cstdint>
 
 template<typename T>
-stack<T>::stack(std::int64_t capacity) : max_size(capacity), data(capacity) {}
+stack<T>::stack() : data(max_size) {}
+
+template<typename T>
+stack<T>::stack(std::int64_t size) {
+  if (size <= 0) {
+    throw std::invalid_argument("Stack size must be positive");
+  }
+  if (size > max_size) {
+    throw std::overflow_error("Stack size exceeds maximum capacity");
+  }
+  data = DynamicArray<T>(size);
+}
 
 template<typename T>
 void stack<T>::push(T item) {
