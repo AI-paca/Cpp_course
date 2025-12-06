@@ -2,16 +2,15 @@
 #define STACK_H
 
 #include "DynamicArray.h"
+#include <cstdint>
 #include <stdexcept>
 
-template<typename T>
-class stack {
+template <typename T> class stack {
 private:
   DynamicArray<T> data;
   static const std::int64_t max_size = 100;
 
 protected:
-
 public:
   stack();
   stack(std::int64_t size);

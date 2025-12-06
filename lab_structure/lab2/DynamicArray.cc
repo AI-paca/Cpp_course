@@ -6,17 +6,16 @@
 #include <stdexcept>
 #include <string>
 
-template<typename T>
-DynamicArray<T>::DynamicArray() {
+template <typename T> DynamicArray<T>::DynamicArray() {
   this->capacity = 8;
   this->data = new T[this->capacity];
 }
 
-template<typename T>
-DynamicArray<T>::DynamicArray(std::int64_t capacity) {
+template <typename T> DynamicArray<T>::DynamicArray(std::int64_t capacity) {
   // check if user is dumb
   if (capacity < 1) {
-    throw std::invalid_argument("Capacity < 1"); // https://en.cppreference.com/w/cpp/error/exception.html
+    throw std::invalid_argument(
+        "Capacity < 1"); // https://en.cppreference.com/w/cpp/error/exception.html
     // std::exception like an animal
     // std::invalid_argument like a dog (heir of animal)
   }
@@ -24,8 +23,7 @@ DynamicArray<T>::DynamicArray(std::int64_t capacity) {
   this->data = new T[this->capacity];
 }
 
-template<typename T>
-DynamicArray<T>::DynamicArray(DynamicArray& other) {
+template <typename T> DynamicArray<T>::DynamicArray(DynamicArray &other) {
   this->size = other.size;
   this->capacity = other.capacity;
   this->data = new T[this->capacity]; // (*this).data
@@ -35,16 +33,37 @@ DynamicArray<T>::DynamicArray(DynamicArray& other) {
   }
 }
 
-template<typename T>
-DynamicArray<T>::~DynamicArray() {
+template <typename T>
+DynamicArray<T> &DynamicArray<T>::operator=(const DynamicArray &other) {
+  if (this == &other) {
+    return *this;
+  }
+
+  // Освобождаем текущую память
+  if (this->data) {
+    delete[] this->data;
+  }
+
+  // Копируем данные
+  this->size = other.size;
+  this->capacity = other.capacity;
+  this->data = new T[this->capacity];
+
+  for (int i = 0; i <= size; ++i) {
+    this->data[i] = other.data[i];
+  }
+
+  return *this;
+}
+
+template <typename T> DynamicArray<T>::~DynamicArray() {
   // deallocate if allocated
   if (this->data) {
     delete[] this->data;
   }
 }
 
-template<typename T>
-void DynamicArray<T>::push_back(T x) {
+template <typename T> void DynamicArray<T>::push_back(T x) {
   // reallocate memory
   // increase capacity
   // copy data
@@ -52,7 +71,7 @@ void DynamicArray<T>::push_back(T x) {
   // assign new to old
   if (size + 1 >= capacity) {
     std::int64_t newCapacity = capacity * 2;
-    T* tempArray = new T[newCapacity];
+    T *tempArray = new T[newCapacity];
     for (int i = 0; i < capacity; ++i) {
       tempArray[i] = data[i];
     }
@@ -65,20 +84,24 @@ void DynamicArray<T>::push_back(T x) {
   // ++size;
 }
 
-template<typename T>
-typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::add(std::int64_t idx1, std::int64_t idx2) {
+template <typename T>
+template <typename U>
+typename std::enable_if<std::is_arithmetic<U>::value, U>::type
+DynamicArray<T>::add(std::int64_t idx1, std::int64_t idx2) {
   if (idx1 > size || idx2 > size || idx1 < 0 || idx2 < 0) {
     throw std::invalid_argument("idx1 or idx2 out of range");
   }
   return data[idx1] + data[idx2];
 }
 
-template<typename T>
-typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::max() {
+template <typename T>
+template <typename U>
+typename std::enable_if<std::is_arithmetic<U>::value, U>::type
+DynamicArray<T>::max() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
-  T currentMax = data[0];
+  U currentMax = data[0];
   for (int i = 1; i <= size; ++i) {
     if (data[i] >= currentMax) {
       currentMax = data[i];
@@ -87,8 +110,10 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::
   return currentMax;
 }
 
-template<typename T>
-typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::min() {
+template <typename T>
+template <typename U>
+typename std::enable_if<std::is_arithmetic<U>::value, U>::type
+DynamicArray<T>::min() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
@@ -101,8 +126,7 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::
   return currentMin;
 }
 
-template<typename T>
-void DynamicArray<T>::clear() {
+template <typename T> void DynamicArray<T>::clear() {
   if (this->data) {
     delete[] this->data;
     this->data = nullptr;
@@ -111,14 +135,12 @@ void DynamicArray<T>::clear() {
   capacity = 8;
 }
 
-template<typename T>
-void DynamicArray<T>::reinitialize() {
+template <typename T> void DynamicArray<T>::reinitialize() {
   clear();
   data = new T[capacity]; // init without zeros for non-arithmetic types
 }
 
-template<typename T>
-void DynamicArray<T>::printData() {
+template <typename T> void DynamicArray<T>::printData() {
   if (isEmpty()) {
     return;
   }
@@ -128,8 +150,7 @@ void DynamicArray<T>::printData() {
   std::cout << std::endl;
 }
 
-template<typename T>
-T DynamicArray<T>::operator[](std::int64_t idx) {
+template <typename T> T DynamicArray<T>::operator[](std::int64_t idx) {
   if (isEmpty() || idx < 0 || idx > size) {
     throw std::invalid_argument("Out of range");
   }
@@ -137,12 +158,14 @@ T DynamicArray<T>::operator[](std::int64_t idx) {
   // return data[idx];     // European operator[]
 }
 
-template<typename T>
-typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::operator()() {
+template <typename T>
+template <typename U>
+typename std::enable_if<std::is_arithmetic<U>::value, U>::type
+DynamicArray<T>::operator()() {
   if (isEmpty()) {
     return 0;
   }
-  T sum = 0;
+  U sum = 0;
   for (int i = 0; i <= size; ++i) {
     sum += data[i];
   }
@@ -151,13 +174,12 @@ typename std::enable_if<std::is_arithmetic<T>::value, T>::type DynamicArray<T>::
 
 ////////////////////////////////////////////// HW
 
-template<typename T>
-void DynamicArray<T>::push_front(T x){
+template <typename T> void DynamicArray<T>::push_front(T x) {
   if (size + 1 >= capacity) {
     std::int64_t newCapacity = capacity * 2;
-    T* tempArray = new T[newCapacity];
+    T *tempArray = new T[newCapacity];
     for (int i = 0; i < capacity; ++i) {
-      tempArray[i+1] = data[i];
+      tempArray[i + 1] = data[i];
     }
     delete[] data;
     data = tempArray;
@@ -165,11 +187,10 @@ void DynamicArray<T>::push_front(T x){
     data[0] = x;
     ++size;
     return;
-  }
-  else {
+  } else {
     T temp = data[0];
     for (int i = 0; i <= size; ++i) {
-      std::swap(data[i+1], temp);
+      std::swap(data[i + 1], temp);
     }
     data[0] = x;
     ++size;
@@ -177,32 +198,30 @@ void DynamicArray<T>::push_front(T x){
   }
 }
 
-template<typename T>
-T DynamicArray<T>::front(){
+template <typename T> T DynamicArray<T>::front() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
   return data[0];
 }
 
-template<typename T>
-T DynamicArray<T>::back(){
+template <typename T> T DynamicArray<T>::back() {
   if (isEmpty()) {
     throw std::invalid_argument("Empty array");
   }
   return data[size];
 }
 
-template<typename T>
-void DynamicArray<T>::insert(std::int64_t idx, T val){
+template <typename T> void DynamicArray<T>::insert(std::int64_t idx, T val) {
   if (idx < 0 || idx > size + 1) {
     throw std::invalid_argument("Index out of range");
   }
 
-  //сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это не инсерт, а replace)
+  // сдвигать элементы массива, стоящие правее data[idx] вправо(Без этого, это
+  // не инсерт, а replace)
   if (size + 1 >= capacity) {
     std::int64_t newCapacity = capacity * 2;
-    T* tempArray = new T[newCapacity];
+    T *tempArray = new T[newCapacity];
     for (int i = 0; i < idx; ++i) {
       tempArray[i] = data[i];
     }
@@ -215,8 +234,7 @@ void DynamicArray<T>::insert(std::int64_t idx, T val){
     capacity = newCapacity;
     ++size;
     return;
-  }
-  else {
+  } else {
     T temp = data[idx];
     data[idx] = val;
     for (int i = idx; i <= size; ++i) {
@@ -227,38 +245,38 @@ void DynamicArray<T>::insert(std::int64_t idx, T val){
   }
 }
 
-template<typename T>
-void DynamicArray<T>::erase(std::int64_t idx){
+template <typename T> void DynamicArray<T>::erase(std::int64_t idx) {
   if (idx < 0 || idx > size) {
     throw std::invalid_argument("Index out of range");
   }
-  //сдвигать элементы массива, стоящие правее data[idx] влево
+  // сдвигать элементы массива, стоящие правее data[idx] влево
   for (int i = idx; i < size; ++i) {
     data[i] = data[i + 1];
   }
   --size;
 }
 
-template<typename T>
-void DynamicArray<T>::erase_after(std::int64_t idx){
+template <typename T> void DynamicArray<T>::erase_after(std::int64_t idx) {
   if (idx < 0 || idx > size) {
     throw std::invalid_argument("Index out of range");
   }
   for (int i = idx + 1; i <= size; ++i) {
     --size;
   }
-  //удалить все после элемента idx (тебя должен капасити остаться тот же, в то время как элементов для доступа меньше)
-  // Было 10 элементов, капасити 15
-  // Erase_after(5)
-  // Остаются первые 6, капасити также 15, размер 6
+  // удалить все после элемента idx (тебя должен капасити остаться тот же, в то
+  // время как элементов для доступа меньше)
+  //  Было 10 элементов, капасити 15
+  //  Erase_after(5)
+  //  Остаются первые 6, капасити также 15, размер 6
 }
 
-template<typename T>
-void DynamicArray<T>::increase_capacity(std::int64_t newCapacity){
+template <typename T>
+void DynamicArray<T>::increase_capacity(std::int64_t newCapacity) {
   if (newCapacity <= capacity) {
-    throw std::invalid_argument("New capacity must be greater than current capacity");
+    throw std::invalid_argument(
+        "New capacity must be greater than current capacity");
   }
-  T* tempArray = new T[newCapacity];
+  T *tempArray = new T[newCapacity];
   for (int i = 0; i <= size; ++i) {
     tempArray[i] = data[i];
   }
@@ -267,14 +285,15 @@ void DynamicArray<T>::increase_capacity(std::int64_t newCapacity){
   capacity = newCapacity;
 }
 
-template<typename T>
-void DynamicArray<T>::decrease_capacity(std::int64_t newCapacity){
+template <typename T>
+void DynamicArray<T>::decrease_capacity(std::int64_t newCapacity) {
   if (newCapacity < 0) {
-    throw std::invalid_argument("New capacity must be greater than or equal to number of elements");
+    throw std::invalid_argument(
+        "New capacity must be greater than or equal to number of elements");
   }
-  //новая вместимость может быть меньше количества элементов
-  T* tempArray = new T[newCapacity];
-  for (int i = 0;(i <= size) && (i < newCapacity); ++i) {
+  // новая вместимость может быть меньше количества элементов
+  T *tempArray = new T[newCapacity];
+  for (int i = 0; (i <= size) && (i < newCapacity); ++i) {
     tempArray[i] = data[i];
   }
   delete[] data;
@@ -285,13 +304,22 @@ void DynamicArray<T>::decrease_capacity(std::int64_t newCapacity){
   }
 }
 
-template<typename T>
-std::int64_t DynamicArray<T>::getSize() const {
+template <typename T> std::int64_t DynamicArray<T>::getSize() const {
   return size + 1; // size хранит индекс последнего элемента, поэтому +1
 }
 
-// Явная инстанциализация для часто используемых типов
+// указываем линковщику, что нужно использовать шаблонные функции для этих типов
 template class DynamicArray<int>;
 template class DynamicArray<float>;
 template class DynamicArray<double>;
-template class DynamicArray<char>;
+template class DynamicArray<std::string>;
+template int DynamicArray<int>::add<int>(std::int64_t, std::int64_t);
+template int DynamicArray<int>::max<int>();
+template int DynamicArray<int>::min<int>();
+template float DynamicArray<float>::add<float>(std::int64_t, std::int64_t);
+template float DynamicArray<float>::max<float>();
+template float DynamicArray<float>::min<float>();
+template double DynamicArray<double>::add<double>(std::int64_t, std::int64_t);
+template double DynamicArray<double>::max<double>();
+template double DynamicArray<double>::min<double>();
+template float DynamicArray<float>::operator()<float>();

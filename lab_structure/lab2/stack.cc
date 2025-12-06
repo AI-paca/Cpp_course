@@ -1,13 +1,11 @@
 #include "stack.h"
 #include "DynamicArray.h"
-#include <stdexcept>
 #include <cstdint>
+#include <stdexcept>
 
-template<typename T>
-stack<T>::stack() : data(max_size) {}
+template <typename T> stack<T>::stack() : data(10) {}
 
-template<typename T>
-stack<T>::stack(std::int64_t size) {
+template <typename T> stack<T>::stack(std::int64_t size) {
   if (size <= 0) {
     throw std::invalid_argument("Stack size must be positive");
   }
@@ -17,24 +15,21 @@ stack<T>::stack(std::int64_t size) {
   data = DynamicArray<T>(size);
 }
 
-template<typename T>
-void stack<T>::push(T item) {
+template <typename T> void stack<T>::push(T item) {
   if (data.getSize() >= max_size) {
     throw std::overflow_error("Stack overflow");
   }
   data.push_back(item);
 }
 
-template<typename T>
-T stack<T>::top() {
+template <typename T> T stack<T>::top() {
   if (isEmpty()) {
     throw std::underflow_error("Stack empty");
   }
   return data.back();
 }
 
-template<typename T>
-T stack<T>::pop() {
+template <typename T> T stack<T>::pop() {
   if (isEmpty()) {
     throw std::underflow_error("Stack empty");
   }
@@ -43,12 +38,12 @@ T stack<T>::pop() {
   return item;
 }
 
-template<typename T>
-bool stack<T>::isEmpty() {
-  return data.getSize() == 0;
-}
+template <typename T> bool stack<T>::isEmpty() { return data.getSize() == 0; }
 
-template<typename T>
-int stack<T>::size() {
-  return data.getSize();
-}
+template <typename T> int stack<T>::size() { return data.getSize(); }
+
+// указываем линковщику, что нужно использовать шаблонные функции для этих типов
+template class stack<int>;
+template class stack<float>;
+template class stack<double>;
+template class stack<std::string>;
